@@ -5,6 +5,7 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     public CharacterController characterController;
+    public Transform cam;
 
     public float speed = 6f;
 
@@ -26,12 +27,12 @@ public class Movement : MonoBehaviour
 
         if(direction.magnitude >= 0.1f)
         {
-            float targetAngle = Mathf.Atan2(direction.x,direction.y) * Mathf.Rad2Deg;
+            float targetAngle = Mathf.Atan2(direction.x,direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            characterController.Move(direction * speed * Time.deltaTime);
+            characterController.Move(moveDir.normalized * speed * Time.deltaTime);
         }
     }
 }

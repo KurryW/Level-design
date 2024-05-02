@@ -17,33 +17,32 @@ public class SwitchCar : MonoBehaviour
 
     public GameObject UICar;
 
-    public Transform PlayerGetsOut;
+    public Transform RespawnPoint;
+
+    MovementCar MovementCar;
 
     bool InCar;
+    bool CanGetInTheCar = false;
+
+    private void Start()
+    {
+        MovementCar = GetComponent<MovementCar>();
+    }
 
     private void Update()
     {
-        //RaycastHit hit;
+        CanGetInCar();
 
-        //if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit))
-        //{
-        //    if (hit.transform.CompareTag("Car"))
-        //    {
-        //        CanGetInCar();
-        //        Debug.Log("CarReady");
-        //        UICar.SetActive(true);
-        //    }
-
-        //    else
-        //    {
-        //        UICar.SetActive(false);
-        //    }
-        //}
+        if (InCar == true)
+        {
+            CanGetOutCar();
+            Debug.Log("ik kan uit de auto");
+        }
     }
 
     private void OnTriggerEnter(Collider ColliderCar)
     {
-        CanGetInCar();
+        CanGetInTheCar = true;
         Debug.Log("CarReady");
         UICar.SetActive(true);
     }
@@ -51,34 +50,42 @@ public class SwitchCar : MonoBehaviour
     private void OnTriggerExit(Collider ColliderCar)
     {
         UICar.SetActive(false);
+        CanGetInTheCar = false;
     }
 
     void CanGetInCar()
     {
-        if(Input.GetKeyDown(KeyCode.Q))
+        if(CanGetInTheCar == true)
         {
-            playerCamera.Priority = 0;
-            carCamera.Priority = 1;
-            CanGetOutCar();
-            InCar = true;
-            Player.SetActive(false);
+            if(Input.GetKey(KeyCode.Q))
+            {
+                gameObject.GetComponent<MovementCar>().enabled = true;
+                playerCamera.Priority = 0;
+                carCamera.Priority = 1;
+                InCar = true;
+                Player.SetActive(false);
+                Debug.Log("ik zit in de auto");
+            }
+
         }
 
     }
 
     void CanGetOutCar()
     {
-        if (InCar == true)
-        {
-            if(Input.GetKeyDown(KeyCode.E)) 
-            { 
-                playerCamera.Priority = 1;
-                carCamera.Priority = 0;
-                Player.SetActive(true);
-                //Player.transform.position = PlayerGetsOut;
-            }
 
+        if(Input.GetKey(KeyCode.E) && MovementCar.speed <= 1f) 
+        {
+            gameObject.GetComponent<MovementCar>().enabled = false;
+            playerCamera.Priority = 1;
+            carCamera.Priority = 0;
+            Player.SetActive(true);
+            UICar.SetActive(false);
+            Player.transform.position = RespawnPoint.transform.position;
+            Debug.Log("ik ga de auto uit");
         }
+
+        
 
     }
 }
